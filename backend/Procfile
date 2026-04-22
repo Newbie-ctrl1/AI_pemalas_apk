@@ -1,1 +1,1 @@
-web: sh -c 'flask --app app.py db upgrade && gunicorn "app:create_app()"'
+web: gunicorn app.main:app --bind 0.0.0.0:$PORT --workers 2 --threads 4 --timeout 120
