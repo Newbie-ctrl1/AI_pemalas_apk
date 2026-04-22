@@ -41,7 +41,7 @@ def create_app():
 
     with app.app_context():
         # Ensure base tables exist for MVP flow.
-        from app.models import ChatMessage, User  # noqa: F401
+        from app.models import ChatMessage, ChatThread, ChatTurn, User  # noqa: F401
 
         db.create_all()
 
