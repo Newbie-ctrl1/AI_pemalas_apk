@@ -71,6 +71,21 @@ def get_thread_messages(thread_id: int):
     return jsonify({"thread": thread.to_dict(), "messages": [item.to_dict() for item in messages]}), 200
 
 
+@chat_bp.delete("/threads/<int:thread_id>")
+@jwt_required()
+def delete_thread(thread_id: int):
+    user_id = int(get_jwt_identity())
+    thread = ChatThread.query.filter_by(id=thread_id, user_id=user_id).first()
+    if not thread:
+        return jsonify({"message": "thread tidak ditemukan"}), 404
+
+    ChatTurn.query.filter_by(user_id=user_id, thread_id=thread_id).delete()
+    db.session.delete(thread)
+    db.session.commit()
+
+    return jsonify({"message": "thread dihapus"}), 200
+
+
 @chat_bp.post("")
 @jwt_required()
 def create_chat():
