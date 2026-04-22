@@ -8,6 +8,31 @@ from app.services.ai_logic import generate_lazy_ai_response
 chat_bp = Blueprint("chat", __name__, url_prefix="/api/chat")
 
 
+@chat_bp.get("/history")
+@jwt_required()
+def get_chat_history():
+    user_id = int(get_jwt_identity())
+    query = str(request.args.get("query", "")).strip().lower()
+
+    history_query = ChatMessage.query.filter_by(user_id=user_id)
+    if query:
+        history_query = history_query.filter(
+            db.or_(
+                db.func.lower(ChatMessage.prompt).contains(query),
+                db.func.lower(ChatMessage.response).contains(query),
+            )
+        )
+
+    history = (
+        history_query
+        .order_by(ChatMessage.created_at.asc())
+        .limit(100)
+        .all()
+    )
+
+    return jsonify({"history": [item.to_dict() for item in history]}), 200
+
+
 @chat_bp.post("")
 @jwt_required()
 def create_chat():
