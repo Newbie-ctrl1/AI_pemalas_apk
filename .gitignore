@@ -22,6 +22,9 @@ migrate_working_dir/
 .settings/
 .vscode/
 
+# Local environment files
+backend/.env
+
 # Flutter/Dart/Pub related
 **/doc/api/
 **/ios/Flutter/.last_build_id
