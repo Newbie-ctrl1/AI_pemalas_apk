@@ -37,7 +37,7 @@ jobs:
         
       # Build APK
       - name: Build APK
-        run: flutter build apk --release --no-daemon
+        run: flutter build apk --release 
         
       # Upload APK
       - name: Upload APK
