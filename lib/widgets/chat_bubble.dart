@@ -20,24 +20,41 @@ class ChatBubble extends StatelessWidget {
   Widget build(BuildContext context) {
     final isUser = message.isUser;
     final align = isUser ? CrossAxisAlignment.end : CrossAxisAlignment.start;
-    final bubbleColor = isUser ? const Color(0xFF0EA5E9) : const Color(0xFFE2E8F0);
-    final textColor = isUser ? Colors.white : const Color(0xFF0F172A);
-    final captionColor = isUser ? Colors.white70 : const Color(0xFF64748B);
+    final bubbleColor = isUser
+        ? Colors.white.withOpacity(0.22)
+        : Colors.white.withOpacity(0.16);
+    final textColor = const Color(0xFF0F172A);
+    final captionColor = const Color(0xFF64748B);
 
     return Column(
       crossAxisAlignment: align,
       children: [
         Container(
           margin: const EdgeInsets.symmetric(vertical: 6),
-          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
           constraints: const BoxConstraints(maxWidth: 300),
           decoration: BoxDecoration(
             color: bubbleColor,
-            borderRadius: BorderRadius.circular(14),
+            borderRadius: BorderRadius.circular(18),
+            border: Border.all(
+              color: Colors.white.withOpacity(isUser ? 0.35 : 0.22),
+              width: 1,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.08),
+                blurRadius: 18,
+                offset: const Offset(0, 8),
+              ),
+            ],
           ),
           child: Text(
             message.text,
-            style: TextStyle(color: textColor, fontSize: 15),
+            style: TextStyle(
+              color: textColor,
+              fontSize: 15,
+              height: 1.35,
+            ),
           ),
         ),
         Padding(

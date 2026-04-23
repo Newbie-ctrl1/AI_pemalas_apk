@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 
 import '../models/chat_message.dart';
@@ -26,6 +28,10 @@ class _ChatScreenState extends State<ChatScreen> {
   bool _isCreatingThread = false;
   int? _activeThreadId;
   String? _token;
+
+  static const Color _pageTop = Color(0xFFFDFEFF);
+  static const Color _pageMid = Color(0xFFEFF6FF);
+  static const Color _pageBottom = Color(0xFFDCEBFF);
 
   @override
   void dispose() {
@@ -343,82 +349,178 @@ class _ChatScreenState extends State<ChatScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final activeTitle = _threads.firstWhere(
+      (t) => t.id == _activeThreadId,
+      orElse: () => ChatThread(id: 0, title: 'AI Pemalas', updatedAt: DateTime.now()),
+    ).title;
+
     return Scaffold(
+      backgroundColor: Colors.transparent,
+      drawerScrimColor: Colors.black.withOpacity(0.14),
       drawer: Drawer(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
         child: SafeArea(
-          child: Column(
-            children: [
-              Padding(
-                padding: const EdgeInsets.all(12),
-                child: FilledButton.icon(
-                  onPressed: _isCreatingThread ? null : _createNewThread,
-                  icon: _isCreatingThread
-                      ? const SizedBox(
-                          height: 16,
-                          width: 16,
-                          child: CircularProgressIndicator(strokeWidth: 2),
-                        )
-                      : const Icon(Icons.add_comment_rounded),
-                  label: const Text('New Chat'),
-                ),
+          child: Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  Colors.white.withOpacity(0.50),
+                  Colors.white.withOpacity(0.22),
+                ],
               ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 12),
-                child: TextField(
-                  controller: _threadSearchController,
-                  textInputAction: TextInputAction.search,
-                  onSubmitted: (_) => _loadThreads(),
-                  decoration: const InputDecoration(
-                    hintText: 'Cari topik...',
-                    prefixIcon: Icon(Icons.search_rounded),
+              border: Border(
+                right: BorderSide(color: Colors.white.withOpacity(0.34)),
+              ),
+            ),
+            child: Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(12),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(18),
+                    child: BackdropFilter(
+                      filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.28),
+                          borderRadius: BorderRadius.circular(18),
+                          border: Border.all(color: Colors.white.withOpacity(0.34)),
+                        ),
+                        child: FilledButton.icon(
+                          style: FilledButton.styleFrom(
+                            backgroundColor: Colors.transparent,
+                            foregroundColor: const Color(0xFF0F172A),
+                            shadowColor: Colors.transparent,
+                          ),
+                          onPressed: _isCreatingThread ? null : _createNewThread,
+                          icon: _isCreatingThread
+                              ? const SizedBox(
+                                  height: 16,
+                                  width: 16,
+                                  child: CircularProgressIndicator(strokeWidth: 2),
+                                )
+                              : const Icon(Icons.add_comment_rounded),
+                          label: const Text('New Chat'),
+                        ),
+                      ),
+                    ),
                   ),
                 ),
-              ),
-              const SizedBox(height: 10),
-              Expanded(
-                child: RefreshIndicator(
-                  onRefresh: _loadThreads,
-                  child: ListView.builder(
-                    itemCount: _threads.length,
-                    itemBuilder: (context, index) {
-                      final thread = _threads[index];
-                      final active = thread.id == _activeThreadId;
-                      return ListTile(
-                        selected: active,
-                        leading: const Icon(Icons.forum_outlined),
-                        title: Text(
-                          thread.title,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(18),
+                    child: BackdropFilter(
+                      filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
+                      child: TextField(
+                        controller: _threadSearchController,
+                        textInputAction: TextInputAction.search,
+                        onSubmitted: (_) => _loadThreads(),
+                        style: const TextStyle(color: Color(0xFF0F172A)),
+                        cursorColor: const Color(0xFF2563EB),
+                        decoration: InputDecoration(
+                          hintText: 'Cari topik...',
+                          hintStyle: const TextStyle(color: Color(0xFF64748B)),
+                          prefixIcon: const Icon(Icons.search_rounded, color: Color(0xFF334155)),
+                          filled: true,
+                          fillColor: Colors.white.withOpacity(0.34),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(18),
+                            borderSide: BorderSide(color: Colors.white.withOpacity(0.24)),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(18),
+                            borderSide: BorderSide(color: Colors.white.withOpacity(0.24)),
+                          ),
+                          focusedBorder: const OutlineInputBorder(
+                            borderRadius: BorderRadius.all(Radius.circular(18)),
+                            borderSide: BorderSide(color: Color(0xFF93C5FD)),
+                          ),
                         ),
-                        subtitle: Text(
-                          '${thread.updatedAt.hour.toString().padLeft(2, '0')}:${thread.updatedAt.minute.toString().padLeft(2, '0')}',
-                        ),
-                        trailing: IconButton(
-                          icon: const Icon(Icons.delete_outline_rounded),
-                          tooltip: 'Hapus topik',
-                          onPressed: () => _deleteThread(thread),
-                        ),
-                        onTap: () async {
-                          Navigator.of(context).maybePop();
-                          await _loadMessages(thread.id);
-                        },
-                      );
-                    },
+                      ),
+                    ),
                   ),
                 ),
-              ),
-            ],
+                const SizedBox(height: 10),
+                Expanded(
+                  child: RefreshIndicator(
+                    onRefresh: _loadThreads,
+                    child: ListView.builder(
+                      itemCount: _threads.length,
+                      itemBuilder: (context, index) {
+                        final thread = _threads[index];
+                        final active = thread.id == _activeThreadId;
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(18),
+                            child: BackdropFilter(
+                              filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  color: active
+                                      ? Colors.white.withOpacity(0.30)
+                                      : Colors.white.withOpacity(0.18),
+                                  borderRadius: BorderRadius.circular(18),
+                                  border: Border.all(
+                                    color: active
+                                        ? Colors.white.withOpacity(0.42)
+                                        : Colors.white.withOpacity(0.22),
+                                  ),
+                                ),
+                                child: ListTile(
+                                  selected: active,
+                                  selectedColor: const Color(0xFF0F172A),
+                                  iconColor: const Color(0xFF334155),
+                                  leading: const Icon(Icons.forum_outlined),
+                                  title: Text(
+                                    thread.title,
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: const TextStyle(color: Color(0xFF0F172A)),
+                                  ),
+                                  subtitle: Text(
+                                    '${thread.updatedAt.hour.toString().padLeft(2, '0')}:${thread.updatedAt.minute.toString().padLeft(2, '0')}',
+                                    style: const TextStyle(color: Color(0xFF475569)),
+                                  ),
+                                  trailing: IconButton(
+                                    icon: const Icon(Icons.delete_outline_rounded),
+                                    color: const Color(0xFF334155),
+                                    tooltip: 'Hapus topik',
+                                    onPressed: () => _deleteThread(thread),
+                                  ),
+                                  onTap: () async {
+                                    Navigator.of(context).maybePop();
+                                    await _loadMessages(thread.id);
+                                  },
+                                ),
+                              ),
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
       appBar: AppBar(
-        title: Text(
-          _threads.firstWhere(
-            (t) => t.id == _activeThreadId,
-            orElse: () => ChatThread(id: 0, title: 'AI Pemalas', updatedAt: DateTime.now()),
-          ).title,
+        backgroundColor: Colors.white.withOpacity(0.18),
+        surfaceTintColor: Colors.transparent,
+        foregroundColor: const Color(0xFF0F172A),
+        elevation: 0,
+        titleTextStyle: const TextStyle(
+          color: Color(0xFF0F172A),
+          fontSize: 18,
+          fontWeight: FontWeight.w600,
         ),
+        title: Text(activeTitle),
         actions: [
           IconButton(
             onPressed: _isLoadingThreads ? null : _loadThreads,
@@ -441,22 +543,73 @@ class _ChatScreenState extends State<ChatScreen> {
             tooltip: 'Logout',
           ),
         ],
+        flexibleSpace: ClipRect(
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.20),
+                border: Border(
+                  bottom: BorderSide(color: Colors.white.withOpacity(0.26)),
+                ),
+              ),
+            ),
+          ),
+        ),
       ),
       body: Column(
         children: [
           Expanded(
             child: Container(
-              color: const Color(0xFFF1F5F9),
-              child: ListView.builder(
-                controller: _scrollController,
-                padding: const EdgeInsets.all(14),
-                itemCount: _messages.length,
-                itemBuilder: (context, index) {
-                  return Align(
-                    alignment: _messages[index].isUser ? Alignment.centerRight : Alignment.centerLeft,
-                    child: ChatBubble(message: _messages[index]),
-                  );
-                },
+              decoration: const BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    _pageTop,
+                    _pageMid,
+                    _pageBottom,
+                  ],
+                ),
+              ),
+              child: Stack(
+                children: [
+                  Positioned(
+                    top: 36,
+                    right: -48,
+                    child: Container(
+                      height: 180,
+                      width: 180,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Colors.white.withOpacity(0.18),
+                      ),
+                    ),
+                  ),
+                  Positioned(
+                    bottom: 70,
+                    left: -56,
+                    child: Container(
+                      height: 220,
+                      width: 220,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Colors.white.withOpacity(0.14),
+                      ),
+                    ),
+                  ),
+                  ListView.builder(
+                    controller: _scrollController,
+                    padding: const EdgeInsets.fromLTRB(14, 16, 14, 16),
+                    itemCount: _messages.length,
+                    itemBuilder: (context, index) {
+                      return Align(
+                        alignment: _messages[index].isUser ? Alignment.centerRight : Alignment.centerLeft,
+                        child: ChatBubble(message: _messages[index]),
+                      );
+                    },
+                  ),
+                ],
               ),
             ),
           ),
@@ -464,37 +617,84 @@ class _ChatScreenState extends State<ChatScreen> {
             top: false,
             child: Padding(
               padding: const EdgeInsets.fromLTRB(12, 8, 12, 12),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: TextField(
-                      controller: _controller,
-                      textInputAction: TextInputAction.send,
-                      onSubmitted: (_) => _sendMessage(),
-                      enabled: !_isSending,
-                      decoration: InputDecoration(
-                        hintText: 'Ketik pertanyaan...',
-                        filled: true,
-                        fillColor: Colors.white,
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide.none,
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(24),
+                child: BackdropFilter(
+                  filter: ImageFilter.blur(sigmaX: 22, sigmaY: 22),
+                  child: Container(
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.20),
+                      borderRadius: BorderRadius.circular(24),
+                      border: Border.all(color: Colors.white.withOpacity(0.28)),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.06),
+                          blurRadius: 24,
+                          offset: const Offset(0, 10),
                         ),
-                      ),
+                      ],
+                    ),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: TextField(
+                            controller: _controller,
+                            textInputAction: TextInputAction.send,
+                            onSubmitted: (_) => _sendMessage(),
+                            enabled: !_isSending,
+                            style: const TextStyle(color: Color(0xFF0F172A)),
+                            cursorColor: const Color(0xFF2563EB),
+                            decoration: InputDecoration(
+                              hintText: 'Ketik pertanyaan...',
+                              hintStyle: const TextStyle(color: Color(0xFF64748B)),
+                              filled: true,
+                              fillColor: Colors.white.withOpacity(0.42),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(18),
+                                borderSide: BorderSide.none,
+                              ),
+                              enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(18),
+                                borderSide: BorderSide(color: Colors.white.withOpacity(0.22)),
+                              ),
+                              focusedBorder: const OutlineInputBorder(
+                                borderRadius: BorderRadius.all(Radius.circular(18)),
+                                borderSide: BorderSide(color: Color(0xFF93C5FD)),
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Container(
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                              colors: [
+                                Colors.white.withOpacity(0.50),
+                                Colors.white.withOpacity(0.22),
+                              ],
+                            ),
+                            borderRadius: BorderRadius.circular(18),
+                            border: Border.all(color: Colors.white.withOpacity(0.28)),
+                          ),
+                          child: IconButton(
+                            onPressed: _isSending ? null : _sendMessage,
+                            color: const Color(0xFF0F172A),
+                            icon: _isSending
+                                ? const SizedBox(
+                                    height: 18,
+                                    width: 18,
+                                    child: CircularProgressIndicator(strokeWidth: 2),
+                                  )
+                                : const Icon(Icons.send_rounded),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                  const SizedBox(width: 8),
-                  IconButton.filled(
-                    onPressed: _isSending ? null : _sendMessage,
-                    icon: _isSending
-                        ? const SizedBox(
-                            height: 18,
-                            width: 18,
-                            child: CircularProgressIndicator(strokeWidth: 2),
-                          )
-                        : const Icon(Icons.send_rounded),
-                  ),
-                ],
+                ),
               ),
             ),
           ),
