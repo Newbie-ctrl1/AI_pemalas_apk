@@ -90,14 +90,14 @@ lib/
 - [x] 5. Middleware auth
 - [x] 6. AI response logic (Groq + fallback rule-based)
 - [x] 7. Chat API endpoint
-- [ ] 8. Deploy backend ke Railway
-- [ ] 9. Setup Flutter project
-- [ ] 10. Login UI Flutter
-- [ ] 11. Simpan token
-- [ ] 12. Chat UI Flutter
-- [ ] 13. Integrasi API
-- [ ] 14. History chat
-- [ ] 15. Finishing UI
+- [x] 8. Deploy backend ke Railway
+- [x] 9. Setup Flutter project
+- [x] 10. Login UI Flutter
+- [x] 11. Simpan token
+- [x] 12. Chat UI Flutter
+- [x] 13. Integrasi API
+- [x] 14. History chat
+- [x] 15. Finishing UI
 
 ## Output Tiap Tahap
 1. Backend Flask bisa jalan lokal.

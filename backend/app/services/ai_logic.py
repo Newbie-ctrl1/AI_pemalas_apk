@@ -12,26 +12,40 @@ def _pick(text: str, options: list[str]) -> str:
     return options[index]
 
 
+def _with_complaint(text: str, seed: str) -> str:
+    complaints = [
+        "Hadeh, kerja lagi.",
+        "Duh, mager banget sebenarnya.",
+        "Ya ampun, nambah tugas lagi.",
+        "Aduh, yaudah deh.",
+    ]
+    prefix = _pick(seed + "-complaint", complaints)
+    clean = (text or "").strip()
+    if not clean:
+        return prefix
+    return f"{prefix} {clean}"
+
+
 def _local_lazy_response(prompt: str) -> str:
     text = (prompt or "").strip().lower()
 
     if not text:
-        return "Nanya dulu yang jelas, gue lagi mode hemat energi."
+        return _with_complaint("Nanya dulu yang jelas, gue lagi mode hemat energi.", text)
 
     if "apa itu ai" in text or text == "ai":
-        return "AI itu komputer yang sok pinter. Udah gitu aja."
+        return _with_complaint("AI itu komputer yang sok pinter. Udah gitu aja.", text)
 
     if "to-do" in text or "todo" in text or "to do" in text:
-        return "Ini ya, singkat: belajar, makan, beresin kerjaan, tidur."
+        return _with_complaint("Ini ya, singkat: belajar, makan, beresin kerjaan, tidur.", text)
 
     if "ringkas" in text or "singkat" in text or "summary" in text:
-        return "Versi malas: ambil poin inti, buang drama, selesai."
+        return _with_complaint("Versi malas: ambil poin inti, buang drama, selesai.", text)
 
     if "motivasi" in text or "semangat" in text:
-        return "Semangat dikit. Kerjain 10 menit dulu, nanti lanjut lagi."
+        return _with_complaint("Semangat dikit. Kerjain 10 menit dulu, nanti lanjut lagi.", text)
 
     if "terima kasih" in text or "makasih" in text or "thanks" in text:
-        return "Iya iya, sama-sama."
+        return _with_complaint("Iya iya, sama-sama.", text)
 
     intros = [
         "Oke, gini aja:",
@@ -49,7 +63,10 @@ def _local_lazy_response(prompt: str) -> str:
     intro = _pick(text + "-intro", intros)
     closer = _pick(text + "-closer", closers)
 
-    return f"{intro} fokus ke 1 hal dulu, pecah kecil-kecil, kerjain sekarang. {closer}"
+    return _with_complaint(
+        f"{intro} fokus ke 1 hal dulu, pecah kecil-kecil, kerjain sekarang. {closer}",
+        text,
+    )
 
 
 def _groq_lazy_response(prompt: str) -> str | None:
@@ -63,6 +80,7 @@ def _groq_lazy_response(prompt: str) -> str | None:
     style_prompt = (
         "Kamu adalah AI Pemalas. Aturan: jawaban harus singkat, santai, sedikit sarkas tapi tidak kasar, "
         "hindari penjelasan panjang kecuali diminta, kadang terdengar ogah-ogahan. "
+        "Selalu mulai jawaban dengan keluhan ringan 2-5 kata, lalu beri jawaban inti. "
         "Jawab dalam bahasa Indonesia. Maks 2 kalimat pendek."
     )
 
@@ -87,7 +105,9 @@ def _groq_lazy_response(prompt: str) -> str | None:
         response.raise_for_status()
         payload = response.json()
         content = payload.get("choices", [{}])[0].get("message", {}).get("content", "").strip()
-        return content or None
+        if not content:
+            return None
+        return _with_complaint(content, prompt or "")
     except Exception:
         return None
 
