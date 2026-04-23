@@ -351,7 +351,7 @@ class _ChatScreenState extends State<ChatScreen> {
   Widget build(BuildContext context) {
     final activeTitle = _threads.firstWhere(
       (t) => t.id == _activeThreadId,
-      orElse: () => ChatThread(id: 0, title: 'AI Pemalas', updatedAt: DateTime.now()),
+      orElse: () => ChatThread(id: 0, title: 'sutar si ai pemalas', updatedAt: DateTime.now()),
     ).title;
 
     return Scaffold(

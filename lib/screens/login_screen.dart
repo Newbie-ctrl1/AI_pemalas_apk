@@ -103,7 +103,7 @@ class _LoginScreenState extends State<LoginScreen> {
 	Widget build(BuildContext context) {
 		final title = _isRegisterMode ? 'Daftar Dulu' : 'Masuk Dulu';
 		final subtitle = _isRegisterMode
-				? 'Bikin akun dulu biar bisa ngobrol sama AI Pemalas.'
+				? 'Bikin akun dulu biar bisa ngobrol sama sutar si ai pemalas.'
 				: 'Jangan masuk. eh tapi ggp deh.';
 		final buttonText = _isRegisterMode ? 'Register' : 'Masuk';
 		final textTheme = Theme.of(context).textTheme;
@@ -159,7 +159,7 @@ class _LoginScreenState extends State<LoginScreen> {
 												crossAxisAlignment: CrossAxisAlignment.stretch,
 												children: [
 													Text(
-														'Sutar si AI Pemalas',
+														'sutar si ai pemalas',
 														style: textTheme.headlineSmall?.copyWith(
 															fontWeight: FontWeight.w800,
 															color: Colors.white,

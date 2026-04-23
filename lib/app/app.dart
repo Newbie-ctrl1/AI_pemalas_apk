@@ -8,7 +8,7 @@ class AIPemalasApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'AI Pemalas',
+      title: 'sutar si ai pemalas',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF0EA5E9)),

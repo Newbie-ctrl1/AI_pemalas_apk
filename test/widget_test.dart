@@ -6,17 +6,14 @@
 // tree, read text, and verify that the values of widget properties are correct.
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:template_rendi_app/main.dart';
+import 'package:sutar_si_ai_pemalas/app/app.dart';
 
 void main() {
   testWidgets('App should start without crashing', (WidgetTester tester) async {
     // Build our app and trigger a frame.
-    await tester.pumpWidget(const MyApp());
+    await tester.pumpWidget(const AIPemalasApp());
 
-    // Verify that app starts with Home Page title
-    expect(find.text('Home Page'), findsOneWidget);
-
-    // Verify that welcome message is displayed
-    expect(find.text('Selamat Datang di Template App'), findsOneWidget);
+    // Verify that the new app branding is displayed
+    expect(find.text('sutar si ai pemalas'), findsOneWidget);
   });
 }
