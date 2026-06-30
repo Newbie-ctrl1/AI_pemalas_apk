@@ -1,4 +1,6 @@
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
+
+WIB = timezone(timedelta(hours=7))
 
 from flask import Blueprint, jsonify, request
 from flask_jwt_extended import get_jwt_identity, jwt_required
@@ -130,7 +132,7 @@ def create_chat():
 
     if thread.title == "Chat Baru":
         thread.title = _make_thread_title(prompt)
-    thread.updated_at = datetime.now(timezone.utc)
+    thread.updated_at = datetime.now(WIB)
 
     db.session.add(chat_turn)
     db.session.add(chat_message)
